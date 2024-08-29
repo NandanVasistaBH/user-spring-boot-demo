@@ -5,6 +5,7 @@ const User = () => {
     const [users, setUsers] = useState([]);
     const [newUser, setNewUser] = useState({});
 
+    // Fetch users from the server
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -17,13 +18,13 @@ const User = () => {
         fetchUsers();
     }, []);
 
+    // Add a new user
     const addUser = async () => {
         const u = newUser;
         try {
             setNewUser({});
-            const resp = await axios.post("http://localhost:1212/user", u);
-            console.log(resp.data);
-            // Refresh user list after adding a new user
+            await axios.post("http://localhost:1212/user", u);
+            // Refresh the user list
             const updatedResp = await axios.get("http://localhost:1212/all");
             setUsers(updatedResp.data);
         } catch (error) {
@@ -32,6 +33,19 @@ const User = () => {
         }
     };
 
+    // Delete a user by email
+    const deleteUser = async (email) => {
+        try {
+            await axios.delete(`http://localhost:1212/user?email=${email}`);
+            // Refresh the user list after deletion
+            const updatedResp = await axios.get("http://localhost:1212/all");
+            setUsers(updatedResp.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // Styles
     const containerStyle = {
         padding: '20px',
         fontFamily: 'Arial, sans-serif',
@@ -47,6 +61,7 @@ const User = () => {
         padding: '10px',
         borderRadius: '5px',
         marginBottom: '10px',
+        position: 'relative', // For positioning the delete button
     };
 
     const inputStyle = {
@@ -63,13 +78,32 @@ const User = () => {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
+        margin: '5px 0',
+    };
+
+    const deleteButtonStyle = {
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        padding: '5px 10px',
+        backgroundColor: '#dc3545',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
     };
 
     return (
         <div style={containerStyle}>
             <h1 style={headerStyle}>List of Users</h1>
             {users && users.map((user, index) => (
-                <div key={user.email} style={userStyle}>
+                <div key={index} style={userStyle}>
+                    <button
+                        style={deleteButtonStyle}
+                        onClick={() => deleteUser(user.email)}
+                    >
+                        Delete
+                    </button>
                     <h3>{user.name}</h3>
                     <h3>{user.email}</h3>
                     <h3>{user.age}</h3>
