@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
+// Get the base URL from environment variables
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 const User = () => {
     const [users, setUsers] = useState([]);
     const [newUser, setNewUser] = useState({});
@@ -9,7 +12,7 @@ const User = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const resp = await axios.get("http://localhost:1212/all");
+                const resp = await axios.get(`${API_BASE_URL}/all`);
                 setUsers(resp.data);
             } catch (error) {
                 console.error(error);
@@ -23,9 +26,9 @@ const User = () => {
         const u = newUser;
         try {
             setNewUser({});
-            await axios.post("http://localhost:1212/user", u);
+            await axios.post(`${API_BASE_URL}/user`, u);
             // Refresh the user list
-            const updatedResp = await axios.get("http://localhost:1212/all");
+            const updatedResp = await axios.get(`${API_BASE_URL}/all`);
             setUsers(updatedResp.data);
         } catch (error) {
             setNewUser(u);
@@ -36,9 +39,9 @@ const User = () => {
     // Delete a user by email
     const deleteUser = async (email) => {
         try {
-            await axios.delete(`http://localhost:1212/user?email=${email}`);
+            await axios.delete(`${API_BASE_URL}/user?email=${email}`);
             // Refresh the user list after deletion
-            const updatedResp = await axios.get("http://localhost:1212/all");
+            const updatedResp = await axios.get(`${API_BASE_URL}/all`);
             setUsers(updatedResp.data);
         } catch (error) {
             console.error(error);
